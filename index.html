@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Online Compiler</title>
+    <script type="text/javascript" src="compiler.js"></script>
+    <script type="text/javascript" src="default-templates.js"></script>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 80%;
+            margin: 5% auto;
+            padding: 2%;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+
+        select, textarea, button {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+            font-size: 16px;
+        }
+
+        textarea {
+            height: 200px;
+            resize: none;
+        }
+
+        button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+            button:hover {
+                background-color: #45a049;
+            }
+
+        .output {
+            padding: 10px;
+            margin-top: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            background-color: #f9f9f9;
+            font-size: 16px;
+            white-space: pre-wrap;
+        }
+    </style>
+
+    <script>
+        async function getAllProgrammingLanguages(){
+            const url = 'https://online-code-compiler.p.rapidapi.com/v1/languages/';
+            const options = {
+                method: 'GET',
+                headers: {
+                    'X-RapidAPI-Key': '38a66360b1mshac073e6005cba83p1beb0cjsnd5bf8b2b8c7f',
+                    'X-RapidAPI-Host': 'online-code-compiler.p.rapidapi.com'
+                }
+            };
+
+            try {
+                const response = await fetch(url, options);
+                const result = JSON.parse(await response.text());
+
+                let filteredLanguages = result.filter(x => allowedProgrammingLanguages.includes(x.id));
+                let languageSelectionContainer = document.getElementById('language');
+                filteredLanguages.forEach(lang => {
+                    let option = document.createElement('option');
+                    option.value = lang.id;
+                    option.text = lang.name;
+                    if (lang.id == 'csharp'){
+                        option.selected = true;
+                        document.getElementById('code').innerHTML = templates[lang.id];
+                    }
+                    languageSelectionContainer.appendChild(option);
+                });
+
+                languageSelectionContainer.addEventListener('change', function(){
+                    document.getElementById('code').innerHTML = templates[languageSelectionContainer.value];
+                });
+            } catch (error) {
+                console.error(error);
+            }
+        }
+
+        getAllProgrammingLanguages();
+        
+    </script>
+
+</head>
+<body>
+    <div class="container">
+        <label for="language">Select Language:</label>
+        <select id="language"></select>
+
+        <textarea id="code" placeholder="Write your code here...">console.log('Hello, World!');</textarea>
+
+        <button onclick="runCode()">Run Code</button><br>
+
+        <p>Output:</p>
+        <pre class="output" id="output"></pre>
+    </div>
+</body>
+</html>
